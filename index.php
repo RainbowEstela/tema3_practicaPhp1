@@ -71,8 +71,22 @@
                 <div id="collapsePages" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Acciones:</h6>
+<?php
+    if(isset($_SESSION["user"])) {
+        echo '
+                        <a class="collapse-item" href="add_proyect.php">Añadir</a>
+                        <a class="collapse-item" href="controlador.php?accion=borrarTodo">Borrar todos</a>   
+        
+        ';
+    } else {
+        echo '
                         <a class="collapse-item" href="login.php">Añadir</a>
-                        <a class="collapse-item" href="register.php">Borrar todos</a>     
+                        <a class="collapse-item" href="login.php">Borrar todos</a>   
+        ';
+    }
+
+?>
+                          
                     </div>
                 </div>
             </li>
@@ -344,15 +358,25 @@
                                         </tr>
                                     </tfoot>
                                     <tbody>
-                                        <tr>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td><button class="btn btn-danger">x</button></td>
-                                        </tr>
+<?php
+    if(isset($_SESSION["user"]) && isset($_SESSION["proyects"])) {
+        foreach($_SESSION["proyects"] as $proyecto) {
+            echo '
+            <tr>
+                <td>'.$proyecto["name"].'</td>
+                <td>'.$proyecto["fechaIni"].'</td>
+                <td>'.$proyecto["fechaFin"].'</td>
+                <td>'.$proyecto["trascurrido"].'</td>
+                <td>'.$proyecto["porcentaje"].'</td>
+                <td>'.$proyecto["importancia"].'</td>
+                <td><a href="controlador.php?accion=borrarProyecto&idProyecto='.$proyecto["id"].'"><button class="btn btn-danger">x</button></a></td>
+            </tr>
+            ';
+        }
+    }
+
+?>
+
                                     </tbody>
                                 </table>
                             </div>
