@@ -1,5 +1,80 @@
 <?php
     session_start();
+    //funciones
+
+    //funcion que añade un proyecto a la sesion y que crea la sesion si no existe
+    function addProyectToSession($id, $nombre, $fechIni, $fechaFin, $porcentaje , $importancia) {
+        //si no existe sesion de proyectos la creamos
+        if(!isset($_SESSION["proyects"])) {
+            $_SESSION["proyects"] = array();
+        }
+
+        //calculamos los dias trascurridos desde la fecha de inicio ya que cambia cada día
+        $diasPasados = date_diff(new DateTime($fechIni), new DateTime("now"));
+            //no se como funciona esta flecha pero en la pagina de php dice que es la forma de pasar un date diff a dias
+        $diasPasadosNumerico = $diasPasados -> format("%a");
+
+        //creamos el array asociativo proyecto
+        $newProyect = [
+            "id" => $id,
+            "name" => $nombre,
+            "fechaIni" => $fechIni,
+            "fechaFin" => $fechaFin,
+            "trascurrido" => $diasPasadosNumerico,
+            "porcentaje" => $porcentaje,
+            "importancia" => $importancia
+        ];
+
+        //metemos el proyecto en la sesion
+        array_push($_SESSION["proyects"],$newProyect);
+
+    }
+
+    //funcion que carga los proyectos del array asociativo
+    function loadProyects() {
+        $proyects = [
+            [
+                "id" => 1,
+                "name" => "pelador de patatas",
+                "fechaIni" => "2018-01-12",
+                "fechaFin" => "2015-01-13",
+                "porcentaje" => "50",
+                "importancia" => 5
+            ],
+
+            [
+                "id" => 3,
+                "name" => "gato robot",
+                "fechaIni" => "2020-06-20",
+                "fechaFin" => "2024-02-14",
+                "porcentaje" => "0",
+                "importancia" => 1
+            ],
+
+            [
+                "id" => 4,
+                "name" => "cafe de chocolate",
+                "fechaIni" => "2023-04-23",
+                "fechaFin" => "2050-12-12",
+                "porcentaje" => "99",
+                "importancia" => 4
+            ],
+
+            [
+                "id" => 6,
+                "name" => "mi nuevo juego",
+                "fechaIni" => "2023-10-15",
+                "fechaFin" => "2200-10-15",
+                "porcentaje" => "0",
+                "importancia" => 1
+            ],
+        ];
+
+        foreach($proyects as $proyect) {
+            addProyectToSession($proyect["id"],$proyect["name"],$proyect["fechaIni"],$proyect["fechaFin"],$proyect["porcentaje"],$proyect["importancia"]);
+        }
+    }
+
 
 
     //peticiones por post
@@ -15,6 +90,9 @@
                     $_SESSION["user"] = [
                         "email" => $email
                     ];
+
+                    //cargar los proyectos en la sesion
+                    loadProyects();
 
                     //lo redirigimos a index.php
                     header("Location: index.php");
@@ -40,6 +118,9 @@
                             "email" => $email
                         ];
 
+                        //cargar los proyectos en la sesion
+                        loadProyects();
+
                         //redirigir a index.php
                         //lo redirigimos a index.php
                          header("Location: index.php");
@@ -61,19 +142,8 @@
                                 $_SESSION["proyects"] = array();
                             }
 
-                            //tratamos la informacion
-                            $id = 0;
-                            $nombre = $_POST["proyectName"];
-                            $fechaIni = $_POST["startDate"];
-                            $fechaFin = $_POST["endDate"];
-                            $porcentaje = $_POST["completePercent"];
-                            $importancia = $_POST["impotancia"];
-
-                            //sacamos los dias transcurridos del proyecto
-                            $diasPasados = date_diff(new DateTime($fechaIni), new DateTime("now"));
-                            $diasPasadosNumerico = $diasPasados -> format("%a");
-                            
                             //creamos una id
+                            $id = 0;
                                 //comprobamos la ids de todos los proyectos
                                 $ids = [];
                                 foreach($_SESSION["proyects"] as $proyecto) {
@@ -90,20 +160,9 @@
 
                                     $contador++;
                                 }
-
-                            //creamos el array asociativo proyecto
-                            $newProyect = [
-                                "id" => $id,
-                                "name" => $nombre,
-                                "fechaIni" => $fechaIni,
-                                "fechaFin" => $fechaFin,
-                                "trascurrido" => $diasPasadosNumerico,
-                                "porcentaje" => $porcentaje,
-                                "importancia" => $importancia
-                            ];
-
-                            //metemos el proyecto en la sesion
-                            array_push($_SESSION["proyects"],$newProyect);
+                            
+                            //metemos el proyecto en la sesion con la funcion
+                            addProyectToSession($id, $_POST["proyectName"], $_POST["startDate"], $_POST["endDate"], $_POST["completePercent"], $_POST["impotancia"]);
                             
                             //lo redirigimos a index.php
                             header("Location: index.php");
